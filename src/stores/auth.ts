@@ -1,63 +1,64 @@
 // src/stores/auth.ts
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import { supabase } from '../supabase/client';
-import type { User, AuthState } from '../components/types';
+import type { User } from 'src/components/types';
+import { supabase } from 'boot/supabase';
 
-export const useAuthStore = defineStore('auth', () => {
-  const user = ref<User | null>(null);
-  const loading = ref<boolean>(false);
+export const useAuthStore = defineStore('auth', {
+    state: () => ({
+        user: null as User | null,
+        loading: true,
+    }),
 
-  const fetchUser = async (): Promise<void> => {
-    loading.value = true;
-    const { data: { user: userData } } = await supabase.auth.getUser();
-    user.value = userData as User | null;
-    loading.value = false;
-  };
+    actions: {
+        async signIn(email: string, password: string): Promise<boolean> {
+            this.loading = true;
 
-  const signIn = async (email: string, password: string): Promise<boolean> => {
-    loading.value = true;
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) {
-      alert(error.message);
-      loading.value = false;
-      return false;
-    }
-    await fetchUser();
-    loading.value = false;
-    return true;
-  };
+            const { error } = await supabase.auth.signInWithPassword({
+                email,
+                password,
+            });
 
-  const signUp = async (email: string, password: string, fullName: string): Promise<boolean> => {
-    loading.value = true;
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          role: 'reader',
+            this.loading = false;
+
+            if (error) {
+                console.error(error.message);
+                return false;
+            }
+
+            return true;
         },
-      },
-    });
-    if (error) {
-      alert(error.message);
-      loading.value = false;
-      return false;
-    }
-    await fetchUser();
-    loading.value = false;
-    return true;
-  };
 
-  const signOut = async (): Promise<void> => {
-    const { error } = await supabase.auth.signOut();
-    if (error) alert(error.message);
-    user.value = null;
-  };
+        async signUp(email: string, password: string, fullName: string): Promise<boolean> {
+            this.loading = true;
 
-  return { user, loading, fetchUser, signIn, signUp, signOut };
+            const { error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        full_name: fullName, // 👈 récupéré dans le trigger
+                    },
+                },
+            });
+
+            this.loading = false;
+
+            if (error) {
+                console.error(error.message);
+                return false;
+            }
+
+            return true;
+        },
+
+        async signOut() {
+            await supabase.auth.signOut();
+            this.user = null;
+        },
+
+        setUser(user: User | null) {
+            this.user = user;
+            this.loading = false;
+        },
+    },
 });

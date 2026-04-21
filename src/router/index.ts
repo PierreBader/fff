@@ -1,35 +1,48 @@
-// src/router/index.ts
-import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
-import HomePage from '../pages/HomePage.vue';
-import EntityListPage from '../pages/EntityListPage.vue';
-import AdminDashboardPage from '../pages/AdminDashboardPage.vue';
-import ProposeEntityPage from '../pages/ProposeEntityPage.vue';
-import LoginPage from '../pages/LoginPage.vue';
-import { useAuthStore } from '../stores/auth';
+import { defineRouter } from '#q-app/wrappers';
+import {
+    createMemoryHistory,
+    createRouter,
+    createWebHashHistory,
+    createWebHistory,
+} from 'vue-router';
+import routes from './routes';
 
-const routes: RouteRecordRaw[] = [
-  { path: '/', component: HomePage },
-  { path: '/entities', component: EntityListPage },
-  { path: '/propose', component: ProposeEntityPage, meta: { requiresAuth: true } },
-  { path: '/admin', component: AdminDashboardPage, meta: { requiresAuth: true, requiresAdmin: true } },
-  { path: '/login', component: LoginPage },
-];
+import { useAuthStore } from 'stores/auth';
+import { fetchUserProfile } from 'src/services/auth';
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
+export default defineRouter(() => {
+    const createHistory = process.env.SERVER
+        ? createMemoryHistory
+        : process.env.VUE_ROUTER_MODE === 'history'
+          ? createWebHistory
+          : createWebHashHistory;
+
+    const Router = createRouter({
+        scrollBehavior: () => ({ left: 0, top: 0 }),
+        routes,
+        history: createHistory(process.env.VUE_ROUTER_BASE),
+    });
+
+    Router.beforeEach(async (to) => {
+        const authStore = useAuthStore();
+
+        if (authStore.loading) {
+            const user = await fetchUserProfile();
+            authStore.setUser(user);
+        }
+
+        const user = authStore.user;
+
+        if (to.meta.requiresAuth && !user) {
+            return '/login';
+        }
+
+        if (to.meta.requiresAdmin && user?.role !== 'admin') {
+            return '/';
+        }
+
+        return true;
+    });
+
+    return Router;
 });
-
-router.beforeEach(async (to) => {
-  const authStore = useAuthStore();
-  await authStore.fetchUser();
-
-  if (to.meta.requiresAuth && !authStore.user) {
-    return '/login';
-  }
-  if (to.meta.requiresAdmin && authStore.user?.role !== 'admin') {
-    return '/';
-  }
-});
-
-export default router;
