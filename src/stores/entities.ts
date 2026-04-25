@@ -10,7 +10,12 @@ export const useEntitiesStore = defineStore('entities', () => {
     const loading = ref<boolean>(false);
 
     const fetchEntities = async (
-        filters: { entity_type?: string; action_zone?: string; is_approved?: boolean } = {},
+        filters: {
+            entity_type?: string;
+            action_zone?: string;
+            is_approved?: boolean;
+            limit?: number;
+        } = {},
     ): Promise<void> => {
         loading.value = true;
         let query = supabase.from('entities').select('*, likes(count)');
@@ -84,10 +89,12 @@ export const useEntitiesStore = defineStore('entities', () => {
 
     const proposeEntity = async (
         entityData: Omit<Entity, 'id' | 'is_approved' | 'created_at' | 'updated_at'>,
+        proposed_by: string,
     ): Promise<boolean> => {
         const { error } = await supabase.from('entity_proposals').insert([
             {
                 entity_data: entityData,
+                proposed_by: proposed_by,
                 status: 'pending',
             },
         ]);
@@ -100,7 +107,7 @@ export const useEntitiesStore = defineStore('entities', () => {
 
     const approveProposal = async (
         proposalId: string,
-        entityData: Omit<Entity, 'id' | 'created_at' | 'updated_at'>,
+        entityData: Omit<Entity, 'id' | 'is_approved' | 'created_at' | 'updated_at'>,
     ): Promise<boolean> => {
         const { error: entityError } = await supabase.from('entities').insert([
             {

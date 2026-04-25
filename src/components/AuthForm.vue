@@ -88,23 +88,24 @@ const fullName = ref('');
 const showSignUp = ref(false);
 const loading = ref(false);
 
-const handleSubmit = async (): Promise<void> => {
+async function handleSubmit() {
     loading.value = true;
     const success = await authStore.signIn(loginEmail.value, loginPassword.value);
     if (success) {
-        router.push('/entities');
+        await router.push('/entities');
     }
     loading.value = false;
-};
+}
 
-const handleSignUp = async (): Promise<void> => {
+async function handleSignUp() {
     loading.value = true;
     const success = await authStore.signUp(signupEmail.value, signupPassword.value, fullName.value);
+
     if (success) {
         alert('Vérifie tes emails pour confirmer ton compte');
         showSignUp.value = false;
-        router.push('/entities');
+        await router.push('/entities');
     }
     loading.value = false;
-};
+}
 </script>
