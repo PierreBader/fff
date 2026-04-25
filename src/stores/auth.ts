@@ -1,64 +1,78 @@
-// src/stores/auth.ts
 import { defineStore } from 'pinia';
-import type { User } from 'src/components/types';
+import { ref } from 'vue';
+import type { User, Session } from '@supabase/supabase-js';
 import { supabase } from 'boot/supabase';
 
-export const useAuthStore = defineStore('auth', {
-    state: () => ({
-        user: null as User | null,
-        loading: true,
-    }),
+export const useAuthStore = defineStore('auth', () => {
+    const user = ref<User | null>(null);
+    const session = ref<Session | null>(null);
+    const loading = ref(true);
 
-    actions: {
-        async signIn(email: string, password: string): Promise<boolean> {
-            this.loading = true;
+    const init = async () => {
+        const { data } = await supabase.auth.getSession();
+        session.value = data.session;
+        user.value = data.session?.user ?? null;
+        loading.value = false;
 
-            const { error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
+        // 🔥 écoute des changements (login/logout)
+        supabase.auth.onAuthStateChange((_event, newSession) => {
+            session.value = newSession;
+            user.value = newSession?.user ?? null;
+        });
+    };
 
-            this.loading = false;
+    const signIn = async (email: string, password: string): Promise<boolean> => {
+        loading.value = true;
 
-            if (error) {
-                console.error(error.message);
-                return false;
-            }
+        const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+        });
 
-            return true;
-        },
+        loading.value = false;
 
-        async signUp(email: string, password: string, fullName: string): Promise<boolean> {
-            this.loading = true;
+        if (error) {
+            console.error(error.message);
+            return false;
+        }
 
-            const { error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        full_name: fullName, // 👈 récupéré dans le trigger
-                    },
+        return true;
+    };
+
+    const signUp = async (email: string, password: string, fullName: string): Promise<boolean> => {
+        loading.value = true;
+
+        const { error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: fullName, // 👈 récupéré dans le trigger
                 },
-            });
+            },
+        });
 
-            this.loading = false;
+        loading.value = false;
 
-            if (error) {
-                console.error(error.message);
-                return false;
-            }
+        if (error) {
+            console.error(error.message);
+            return false;
+        }
 
-            return true;
-        },
+        return true;
+    };
 
-        async signOut() {
-            await supabase.auth.signOut();
-            this.user = null;
-        },
+    const signOut = async () => {
+        await supabase.auth.signOut();
+    };
 
-        setUser(user: User | null) {
-            this.user = user;
-            this.loading = false;
-        },
-    },
+    return {
+        user,
+        session,
+        loading,
+        init,
+        signIn,
+        signUp,
+        signOut,
+    };
 });

@@ -7,8 +7,7 @@ import {
 } from 'vue-router';
 import routes from './routes';
 
-import { useAuthStore } from 'stores/auth';
-import { fetchUserProfile } from 'src/services/auth';
+import { supabase } from 'boot/supabase';
 
 export default defineRouter(() => {
     const createHistory = process.env.SERVER
@@ -24,20 +23,18 @@ export default defineRouter(() => {
     });
 
     Router.beforeEach(async (to) => {
-        const authStore = useAuthStore();
+        const {
+            data: { session },
+        } = await supabase.auth.getSession();
 
-        if (authStore.loading) {
-            const user = await fetchUserProfile();
-            authStore.setUser(user);
-        }
+        const authUser = session?.user;
 
-        const user = authStore.user;
-
-        if (to.meta.requiresAuth && !user) {
+        if (to.meta.requiresAuth && !authUser) {
             return '/login';
         }
 
-        if (to.meta.requiresAdmin && user?.role !== 'admin') {
+        if (to.meta.requiresManager && authUser?.app_metadata?.role !== 'manager') {
+            console.log('Petit malin');
             return '/';
         }
 
