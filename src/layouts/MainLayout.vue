@@ -6,7 +6,12 @@
                 <div v-if="authStore.user">
                     <q-btn flat label="Entités" to="/entities" />
                     <q-btn flat label="Proposer" to="/propose" />
-                    <q-btn v-if="authStore.user?.role === 'admin'" flat label="Admin" to="/admin" />
+                    <q-btn
+                        v-if="authStore.user?.app_metadata.role === 'manager'"
+                        flat
+                        label="Admin"
+                        to="/admin"
+                    />
                     <q-btn flat label="Déconnexion" @click="authStore.signOut()" />
                 </div>
                 <div v-else>
@@ -25,4 +30,6 @@
 import { useAuthStore } from '../stores/auth';
 
 const authStore = useAuthStore();
+
+console.log(authStore.user?.app_metadata.role);
 </script>
