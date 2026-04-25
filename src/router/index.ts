@@ -34,7 +34,6 @@ export default defineRouter(() => {
         }
 
         if (to.meta.requiresManager && authUser?.app_metadata?.role !== 'manager') {
-            console.log('Petit malin');
             return '/';
         }
 

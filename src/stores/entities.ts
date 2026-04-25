@@ -44,7 +44,7 @@ export const useEntitiesStore = defineStore('entities', () => {
         loading.value = true;
         const { data, error } = await supabase
             .from('entity_proposals')
-            .select('*, users(full_name)')
+            .select('*, creator:proposed_by(full_name), reviewer:reviewed_by(full_name)')
             .eq('status', 'pending');
         if (error) {
             alert(error.message);
@@ -91,7 +91,6 @@ export const useEntitiesStore = defineStore('entities', () => {
         entityData: Omit<Entity, 'id' | 'is_approved' | 'created_at' | 'updated_at'>,
         proposed_by: string,
     ): Promise<boolean> => {
-        console.log('Proposition', entityData, proposed_by);
         const { error } = await supabase.from('entity_proposals').insert([
             {
                 entity_data: entityData,
