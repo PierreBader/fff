@@ -1,7 +1,7 @@
 export default {
     entity: {
         types: {
-            organizer: 'Organizer',
+            organizer: 'Organisateur',
         },
     },
 };
