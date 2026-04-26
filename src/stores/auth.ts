@@ -14,7 +14,6 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = data.session?.user ?? null;
         loading.value = false;
 
-        // 🔥 écoute des changements (login/logout)
         supabase.auth.onAuthStateChange((_event, newSession) => {
             session.value = newSession;
             user.value = newSession?.user ?? null;
