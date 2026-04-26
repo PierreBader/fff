@@ -1,5 +1,5 @@
 <template>
-    <q-card class="q-pa-md" style="max-width: 400px; margin: 0 auto">
+    <q-card class="q-pa-md fixed-center shadow-5" style="width: 400px; margin: 0 auto">
         <q-card-section>
             <h4 class="text-center">Connexion</h4>
         </q-card-section>
@@ -109,3 +109,9 @@ async function handleSignUp() {
     loading.value = false;
 }
 </script>
+
+<style scoped>
+.q-card {
+    border-radius: 2em;
+}
+</style>

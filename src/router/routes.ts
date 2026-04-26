@@ -2,12 +2,32 @@ import type { RouteRecordRaw } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
     {
+        path: '/login',
+
+        component: () => import('layouts/AuthLayout.vue'),
+        children: [
+            {
+                path: '',
+                component: () => import('pages/LoginPage.vue'),
+            },
+        ],
+    },
+
+    {
         path: '/',
         component: () => import('layouts/MainLayout.vue'),
         children: [
-            { path: '', component: () => import('pages/HomePage.vue') },
+            {
+                path: '',
+                component: () => import('pages/HomePage.vue'),
+                meta: { requiresAuth: true },
+            },
 
-            { path: 'entities', component: () => import('pages/EntityListPage.vue') },
+            {
+                path: 'entities',
+                component: () => import('pages/EntityListPage.vue'),
+                meta: { requiresAuth: true },
+            },
 
             {
                 path: 'propose',
@@ -20,8 +40,6 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('pages/AdminDashboardPage.vue'),
                 meta: { requiresAuth: true, requiresManager: true },
             },
-
-            { path: 'login', component: () => import('pages/LoginPage.vue') },
         ],
     },
 

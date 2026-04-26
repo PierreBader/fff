@@ -1,7 +1,7 @@
 <template>
-  <q-page class="q-pa-md">
-    <AuthForm />
-  </q-page>
+    <q-page class="q-pa-md">
+        <AuthForm />
+    </q-page>
 </template>
 
 <script setup lang="ts">
