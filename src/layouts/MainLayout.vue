@@ -9,6 +9,9 @@
                     </q-avatar>
                     FritzFroschFondue
                 </q-toolbar-title>
+
+                <locale-selecter />
+
                 <div v-if="authStore.user">
                     <q-btn flat label="Déconnexion" @click="authStore.signOut()" to="/login" />
                 </div>
@@ -61,6 +64,7 @@
 </template>
 
 <script setup lang="ts">
+import LocaleSelecter from 'src/components/LocaleSelecter.vue';
 import { useAuthStore } from '../stores/auth';
 import { ref } from 'vue';
 

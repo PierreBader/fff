@@ -1,21 +1,28 @@
 <template>
     <q-card class="q-pa-md fixed-center shadow-5" style="width: 400px; margin: 0 auto">
+        <locale-selecter />
         <q-card-section>
-            <h4 class="text-center">Connexion</h4>
+            <h4 class="text-center">{{ t('auth.loginTitle') }}</h4>
         </q-card-section>
         <q-card-section>
             <q-form @submit.prevent="handleSubmit">
-                <q-input v-model="loginEmail" label="Email" type="email" required class="q-mb-md" />
+                <q-input
+                    v-model="loginEmail"
+                    :label="t('auth.email')"
+                    type="email"
+                    required
+                    class="q-mb-md"
+                />
                 <q-input
                     v-model="loginPassword"
-                    label="Mot de passe"
+                    :label="t('auth.password')"
                     type="password"
                     required
                     class="q-mb-md"
                 />
                 <div class="row q-mb-md">
                     <q-btn
-                        label="Se connecter"
+                        :label="t('auth.loginSubmit')"
                         type="submit"
                         color="primary"
                         class="full-width"
@@ -24,7 +31,7 @@
                 </div>
                 <div class="row">
                     <q-btn
-                        label="S'inscrire"
+                        :label="t('auth.signUp')"
                         @click="showSignUp = true"
                         color="secondary"
                         class="full-width"
@@ -34,31 +41,35 @@
         </q-card-section>
     </q-card>
 
-    <!-- Modal d'inscription -->
     <q-dialog v-model="showSignUp">
         <q-card>
             <q-card-section>
-                <h4>Inscription</h4>
+                <h4>{{ t('auth.signUpTitle') }}</h4>
             </q-card-section>
             <q-card-section>
                 <q-form @submit.prevent="handleSignUp">
-                    <q-input v-model="fullName" label="Nom complet" required class="q-mb-md" />
+                    <q-input
+                        v-model="fullName"
+                        :label="t('auth.fullName')"
+                        required
+                        class="q-mb-md"
+                    />
                     <q-input
                         v-model="signupEmail"
-                        label="Email"
+                        :label="t('auth.email')"
                         type="email"
                         required
                         class="q-mb-md"
                     />
                     <q-input
                         v-model="signupPassword"
-                        label="Mot de passe"
+                        :label="t('auth.password')"
                         type="password"
                         required
                         class="q-mb-md"
                     />
                     <q-btn
-                        label="S'inscrire"
+                        :label="t('auth.signUp')"
                         type="submit"
                         color="primary"
                         class="full-width"
@@ -74,6 +85,12 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
+
+import LocaleSelecter from '../components/LocaleSelecter.vue';
+
+import { useI18n } from 'vue-i18n';
+
+const { t } = useI18n({ useScope: 'global' });
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -102,7 +119,7 @@ async function handleSignUp() {
     const success = await authStore.signUp(signupEmail.value, signupPassword.value, fullName.value);
 
     if (success) {
-        alert('Vérifie tes emails pour confirmer ton compte');
+        alert(t('auth.confirmYourMail'));
         showSignUp.value = false;
         await router.push('/entities');
     }
