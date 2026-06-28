@@ -13,7 +13,7 @@ const index = ref<number>(1);
 
 const backgroundClass = computed(() => 'bg' + index.value);
 
-onMounted(async () => {
+onMounted(() => {
     cycleIndex();
 });
 
