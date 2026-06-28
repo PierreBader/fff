@@ -34,3 +34,5 @@ debug.log
 .env.local*
 .env
 .vercel
+
+yarn.lock

@@ -2,42 +2,25 @@
 
 Rhein... Raus !
 
-## Install the dependencies
+## Installation
 
-```bash
+nvm install ^22
+nvm use 22.23.1
+npm install -g yarn
 yarn
-# or
-npm install
+
+## Environnement
+
+Créer un fichier .env sous la forme
+
+```
+VITE_SUPABASE_URL=https://abcde.supabase.co
+VITE_SUPABASE_KEY=sb_publishable_xyz
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+URL : disponible sur l'accueil supabase
+KEY : nouvelle publishable key dans supabase / settings / API Keys
 
-```bash
-quasar dev
-```
+## Run
 
-### Lint the files
-
-```bash
-yarn lint
-# or
-npm run lint
-```
-
-### Format the files
-
-```bash
-yarn format
-# or
-npm run format
-```
-
-### Build the app for production
-
-```bash
-quasar build
-```
-
-### Customize the configuration
-
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
+yarn quasar dev
