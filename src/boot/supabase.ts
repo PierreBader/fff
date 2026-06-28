@@ -10,10 +10,8 @@ if (!supabaseUrl || !supabaseKey) {
     );
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default defineBoot(({ app }) => {
     app.provide('supabase', supabase);
 });
-
-export { supabase };
