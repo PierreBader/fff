@@ -18,7 +18,6 @@
                 class="q-mt-md"
             />
         </div>
-        <MapView :entities="entities" />
     </q-page>
 </template>
 
@@ -27,7 +26,6 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
 import { useEntitiesStore } from '../stores/entities';
-import MapView from '../components/MapView.vue';
 import type { Entity } from '../components/types';
 
 const router = useRouter();
