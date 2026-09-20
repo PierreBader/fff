@@ -64,9 +64,9 @@
 </template>
 
 <script setup lang="ts">
-import LocaleSelecter from 'src/components/LocaleSelecter.vue';
-import { useAuthStore } from '../stores/auth';
-import { ref } from 'vue';
+import LocaleSelecter from "src/components/LocaleSelecter.vue";
+import { useAuthStore } from "../stores/auth";
+import { ref } from "vue";
 
 const authStore = useAuthStore();
 
