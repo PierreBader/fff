@@ -2,7 +2,7 @@
     <q-card class="q-pa-md fixed-center shadow-5" style="width: 400px; margin: 0 auto">
         <locale-selecter />
         <q-card-section>
-            <h4 class="text-center">{{ t('auth.loginTitle') }}</h4>
+            <h4 class="text-center">{{ t("auth.loginTitle") }}</h4>
         </q-card-section>
         <q-card-section>
             <q-form @submit.prevent="handleSubmit">
@@ -44,7 +44,7 @@
     <q-dialog v-model="showSignUp">
         <q-card>
             <q-card-section>
-                <h4>{{ t('auth.signUpTitle') }}</h4>
+                <h4>{{ t("auth.signUpTitle") }}</h4>
             </q-card-section>
             <q-card-section>
                 <q-form @submit.prevent="handleSignUp">
@@ -82,34 +82,41 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { useAuthStore } from '../stores/auth';
+import { onMounted } from "vue";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "../stores/auth";
 
-import LocaleSelecter from '../components/LocaleSelecter.vue';
+import LocaleSelecter from "../components/LocaleSelecter.vue";
 
-import { useI18n } from 'vue-i18n';
+import { useI18n } from "vue-i18n";
 
-const { t } = useI18n({ useScope: 'global' });
+const emit = defineEmits(["login"]);
+
+const { t } = useI18n({ useScope: "global" });
 
 const router = useRouter();
 const authStore = useAuthStore();
 
-const loginEmail = ref('');
-const loginPassword = ref('');
+const loginEmail = ref("");
+const loginPassword = ref("");
 
-const signupEmail = ref('');
-const signupPassword = ref('');
+const signupEmail = ref("");
+const signupPassword = ref("");
 
-const fullName = ref('');
+const fullName = ref("");
 const showSignUp = ref(false);
 const loading = ref(false);
+
+onMounted(() => {
+    console.log("onMounted authForm", useI18n().locale);
+});
 
 async function handleSubmit() {
     loading.value = true;
     const success = await authStore.signIn(loginEmail.value, loginPassword.value);
     if (success) {
-        await router.push('/entities');
+        emit("login");
     }
     loading.value = false;
 }
@@ -119,9 +126,9 @@ async function handleSignUp() {
     const success = await authStore.signUp(signupEmail.value, signupPassword.value, fullName.value);
 
     if (success) {
-        alert(t('auth.confirmYourMail'));
+        alert(t("auth.confirmYourMail"));
         showSignUp.value = false;
-        await router.push('/entities');
+        await router.push("/entities");
     }
     loading.value = false;
 }
