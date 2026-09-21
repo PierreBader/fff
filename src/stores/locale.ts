@@ -16,7 +16,7 @@ const quasarLangs = {
 
 export const useLocaleStore = defineStore("locale", {
     state: () => ({
-        locale: "fr-FR" as Locale,
+        locale: "fr-FR",
     }),
 
     actions: {
