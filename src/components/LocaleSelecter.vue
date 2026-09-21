@@ -9,18 +9,26 @@
         map-options
         options-dense
         style="min-width: 150px"
+        @update:model-value="localeStore.setLocale"
     />
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
+import { storeToRefs } from "pinia";
+import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
-const { locale, t } = useI18n({ useScope: 'global' });
+import { useLocaleStore } from "src/stores/locale";
+
+const localeStore = useLocaleStore();
+
+const { locale } = storeToRefs(localeStore);
+
+const { t } = useI18n({ useScope: "global" });
 
 const localeOptions = computed(() => [
-    { value: 'fr-FR', label: t('lang.fr-FR') },
-    { value: 'de-DE', label: t('lang.de-DE') },
-    { value: 'en-US', label: t('lang.en-US') },
+    { value: "fr-FR", label: t("lang.fr-FR") },
+    { value: "de-DE", label: t("lang.de-DE") },
+    { value: "en-US", label: t("lang.en-US") },
 ]);
 </script>
