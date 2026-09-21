@@ -2,7 +2,7 @@
     <div class="radar-background">
         <svg
             class="radar-svg"
-            :viewBox="'0 0' + WIDTH + ' ' + HEIGHT"
+            :viewBox="'-' + WIDTH / 2 + ' -' + HEIGHT / 2 + ' ' + WIDTH + ' ' + HEIGHT"
             preserveAspectRatio="xMidYMid slice"
         >
             <g
@@ -36,9 +36,10 @@
             <circle
                 class="logo-flash"
                 :class="{ active: animationState === 'logo' }"
-                cx="768"
-                cy="450"
-                r="100"
+                cx="0"
+                cy="20"
+                r="150"
+                @animationend="onFlashAnimationEnd"
             />
         </svg>
 
@@ -52,10 +53,14 @@
 import { onBeforeUnmount, onMounted, ref } from "vue";
 
 const WIDTH = 3000;
+const MINX = -1500;
+const MAXX = 1500;
 const HEIGHT = 1500;
-const DECORATIVE_PARTICLES = 200;
-const CONVERGENCE_DURATION = 500;
-const CONVERGENCE_STAGGER = 90;
+const MINY = -750;
+const MAXY = 750;
+const DECORATIVE_PARTICLES = 250;
+const CONVERGENCE_DURATION = 2000;
+const CONVERGENCE_STAGGER = 30;
 const LETTER_PROBABILITY = 0.25;
 
 type LogoLetter = {
@@ -77,117 +82,117 @@ const LOGO: LogoElement[] = [
     {
         type: "letter",
         value: "R",
-        x: 240,
-        y: 450,
+        x: -180,
+        y: 30,
     },
     {
         type: "dot",
-        x: 280,
-        y: 458,
+        x: -140,
+        y: 38,
     },
     {
         type: "letter",
         value: "A",
-        x: 320,
-        y: 450,
+        x: -100,
+        y: 30,
     },
     {
         type: "dot",
-        x: 360,
-        y: 458,
+        x: -60,
+        y: 38,
     },
     {
         type: "letter",
         value: "D",
-        x: 400,
-        y: 450,
+        x: -20,
+        y: 30,
     },
     {
         type: "dot",
-        x: 440,
-        y: 458,
+        x: 20,
+        y: 38,
     },
     {
         type: "letter",
         value: "A",
-        x: 480,
-        y: 450,
+        x: 60,
+        y: 30,
     },
     {
         type: "dot",
-        x: 520,
-        y: 458,
+        x: 100,
+        y: 38,
     },
     {
         type: "letter",
         value: "R",
-        x: 560,
-        y: 450,
+        x: 140,
+        y: 30,
     },
     {
         type: "dot",
-        x: 600,
-        y: 458,
+        x: 180,
+        y: 38,
     },
     {
         type: "dot",
-        x: 192,
-        y: 433,
+        x: -228,
+        y: 13,
     },
     {
         type: "dot",
-        x: 210,
-        y: 490,
+        x: -210,
+        y: 70,
     },
     {
         type: "dot",
-        x: 260,
-        y: 405,
+        x: -160,
+        y: -15,
     },
     {
         type: "dot",
-        x: 300,
-        y: 510,
+        x: -120,
+        y: 90,
     },
     {
         type: "dot",
-        x: 340,
-        y: 380,
+        x: -80,
+        y: -40,
     },
     {
         type: "dot",
-        x: 375,
-        y: 550,
+        x: -45,
+        y: 130,
     },
     {
         type: "dot",
-        x: 430,
-        y: 525,
+        x: 10,
+        y: 105,
     },
     {
         type: "dot",
-        x: 455,
-        y: 360,
+        x: 35,
+        y: -60,
     },
     {
         type: "dot",
-        x: 500,
-        y: 510,
+        x: 80,
+        y: 90,
     },
     {
         type: "dot",
-        x: 540,
-        y: 405,
+        x: 120,
+        y: -15,
     },
     {
         type: "dot",
-        x: 580,
-        y: 490,
+        x: 160,
+        y: 70,
     },
     {
         type: "dot",
-        x: 625,
-        y: 433,
+        x: 205,
+        y: 13,
     },
 ];
 
@@ -261,8 +266,8 @@ function createParticle(
         }
     }
 
-    const x = random(40, WIDTH - 40);
-    const y = random(40, HEIGHT - 40);
+    const x = random(MINX + 40, MAXX - 40);
+    const y = random(MINY + 40, MAXY - 40);
 
     const angle = random(0, Math.PI * 2);
 
@@ -284,7 +289,7 @@ function createParticle(
         rotation: random(-20, 20),
         rotationSpeed: random(-2, 2),
         radius,
-        opacity: random(0.3, 0.85),
+        opacity: random(0.2, 0.7),
         isLogo,
         startX: x,
         startY: y,
@@ -314,26 +319,30 @@ function updateIdle(delta: number) {
     const seconds = delta / 1000;
 
     for (const particle of particles.value) {
-        particle.x += particle.vx * seconds;
-        particle.y += particle.vy * seconds;
+        moveIdle(particle, seconds);
+    }
+}
 
-        particle.rotation += particle.rotationSpeed * seconds;
+function moveIdle(particle: Particle, seconds: number): void {
+    particle.x += particle.vx * seconds;
+    particle.y += particle.vy * seconds;
 
-        if (particle.x < -100) {
-            particle.x = WIDTH + 100;
-        }
+    particle.rotation += particle.rotationSpeed * seconds;
 
-        if (particle.x > WIDTH + 100) {
-            particle.x = -100;
-        }
+    if (particle.x < MINX - 100) {
+        particle.x = MAXX + 100;
+    }
 
-        if (particle.y < -100) {
-            particle.y = HEIGHT + 100;
-        }
+    if (particle.x > MAXX + 100) {
+        particle.x = MINX - 100;
+    }
 
-        if (particle.y > HEIGHT + 100) {
-            particle.y = -100;
-        }
+    if (particle.y < MINY) {
+        particle.y = MAXY + 100;
+    }
+
+    if (particle.y > MAXY + 100) {
+        particle.y = MINY - 100;
     }
 }
 
@@ -349,30 +358,11 @@ function updateConvergence(now: number, delta: number) {
 
     for (const particle of particles.value) {
         if (!particle.isLogo) {
-            const fadeProgress = Math.min(elapsed / (CONVERGENCE_DURATION * 0.75), 1);
-            const newOpacity = 0.85 * (1 - fadeProgress);
+            const fadeProgress = Math.min(elapsed / CONVERGENCE_DURATION, 1);
+            const newOpacity = 1 - fadeProgress;
             particle.opacity = Math.min(particle.opacity, newOpacity);
-            particle.x += particle.vx * seconds;
-            particle.y += particle.vy * seconds;
 
-            particle.rotation += particle.rotationSpeed * seconds;
-
-            if (particle.x < -100) {
-                particle.x = WIDTH + 100;
-            }
-
-            if (particle.x > WIDTH + 100) {
-                particle.x = -100;
-            }
-
-            if (particle.y < -100) {
-                particle.y = HEIGHT + 100;
-            }
-
-            if (particle.y > HEIGHT + 100) {
-                particle.y = -100;
-            }
-
+            moveIdle(particle, seconds);
             continue;
         }
 
@@ -389,12 +379,8 @@ function updateConvergence(now: number, delta: number) {
         particle.x = particle.startX + (particle.targetX - particle.startX) * eased;
         particle.y = particle.startY + (particle.targetY - particle.startY) * eased;
 
-        const centerX = WIDTH / 2;
-        const direction = particle.startX < centerX ? 1 : -1;
-        const rotations = 1.5;
-
-        particle.rotation = particle.startRotation + direction * 360 * rotations * (1 - eased);
-        particle.opacity = 1;
+        particle.rotation = particle.startRotation - particle.startRotation * eased;
+        particle.opacity = Math.max(particle.opacity, progress);
 
         if (progress < 1) {
             allFinished = false;
@@ -414,11 +400,6 @@ function updateConvergence(now: number, delta: number) {
                 particle.opacity = 0;
             }
         }
-
-        animationResolve?.();
-
-        animationResolve = null;
-        animationPromise = null;
     }
 }
 
@@ -475,6 +456,17 @@ function playLogoAnimation(): Promise<void> {
     });
 
     return animationPromise;
+}
+
+function onFlashAnimationEnd(event: AnimationEvent): void {
+    if (!event.animationName.startsWith("logoFlash")) {
+        return;
+    }
+
+    animationResolve?.();
+
+    animationResolve = null;
+    animationPromise = null;
 }
 
 defineExpose({
@@ -538,9 +530,8 @@ onBeforeUnmount(() => {
 }
 
 .logo-flash.active {
-    animation: logoFlash 900ms cubic-bezier(0.16, 1, 0.3, 1);
+    animation: logoFlash 1200ms cubic-bezier(0.16, 1, 0.3, 1) 1 normal forwards;
 }
-
 @keyframes logoFlash {
     0% {
         opacity: 0.8;

@@ -1,7 +1,8 @@
 <template>
     <q-page class="q-pa-md">
         <RadarBackground ref="radar" />
-        <div :class="{ hidden: animating }">
+
+        <div :class="{ animating }">
             <AuthForm @login.once="login" />
         </div>
     </q-page>
@@ -11,9 +12,9 @@
 import { ref } from "vue";
 import AuthForm from "../components/AuthForm.vue";
 import RadarBackground from "../components/RadarBackground.vue";
-//import { useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
-//const router = useRouter();
+const router = useRouter();
 
 const radar = ref<InstanceType<typeof RadarBackground> | null>(null);
 
@@ -22,14 +23,10 @@ const animating = ref(false);
 async function login() {
     animating.value = true;
 
-    console.log("Hopla login");
-
     try {
         await radar.value?.playLogoAnimation();
 
-        console.log("Film terminé");
-
-        //await router.push("/entities");
+        await router.push("/entities");
     } catch (error) {
         console.error(error);
     } finally {
@@ -38,7 +35,7 @@ async function login() {
 }
 </script>
 <style lang="css" scoped>
-.hidden {
+.animating {
     opacity: 0;
     transition: all 0.5s;
 }
